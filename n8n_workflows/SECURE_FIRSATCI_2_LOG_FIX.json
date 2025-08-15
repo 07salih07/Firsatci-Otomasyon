@@ -1,108 +1,323 @@
 {
-"name": "SECURE_FIRSATCI_2_LOG_FIX",
-"active": false,
-"nodes": [
-{
-"parameters": {
-"path": "firsatci/run",
-"httpMethod": "POST",
-"responseMode": "responseNode"
-},
-"id": "Webhook_1",
-"name": "Webhook (POST /firsatci/run)",
-"type": "n8n-nodes-base.webhook",
-6
-"typeVersion": 2.1,
-"position": [ -240, 280 ]
-},
-{
-"parameters": {
-"conditions": {
-"options": { "caseSensitive": true, "typeValidation": "strict",
-"version": 2 },
-"conditions": [
-{
-"id": "cond-key",
-"leftValue": "={{ ($json[\"headers\"][\"x-api-key\"] ||
-\"\").trim() }}",
-"rightValue": "={{ ($vars.N8N_ACTION_KEY || \"\").trim() }}",
-"operator": { "type": "string", "operation": "equals", "name":
-"filter.operator.equals" }
-}
-],
-"combinator": "and"
-}
-},
-"id": "If_Auth",
-"name": "If (x-api-key)",
-"type": "n8n-nodes-base.if",
-"typeVersion": 2.2,
-"position": [ 40, 280 ]
-},
-{
-"parameters": {
-"responseCode": 401,
-"responseFormat": "json",
-"responseBody": "={{ ({ ok: false, error: 'Unauthorized', reason:
-'Invalid x-api-key' }) }}"
-},
-"id": "Resp_401",
-"name": "Respond 401",
-"type": "n8n-nodes-base.respondToWebhook",
-"typeVersion": 1.5,
-"position": [ 340, 410 ]
-},
-{
-"parameters": {
-"method": "POST",
-"url": "={{ $vars.SUPABASE_URL + '/rest/v1/ingest_logs' }}",
-"authentication": "none",
-"sendBody": true,
-"jsonParameters": true,
-"headerParametersUi": {
-"parameter": [
-{ "name": "apikey", "value":
-"={{ $vars.SUPABASE_SERVICE_KEY }}" },
-7
-{ "name": "Authorization", "value": "={{ 'Bearer ' +
-$vars.SUPABASE_SERVICE_KEY }}" },
-{ "name": "Content-Type", "value": "application/json" },
-{ "name": "Prefer", "value": "return=representation" }
-]
-},
-"bodyParametersJson":
-"={{ ({ mode: $json.body?.mode ?? 'full', city: $json.body?.city ?? '',
-district: $json.body?.district ?? '', threshold:
-Number($json.body?.threshold ?? 0), payload: $json.body ?? {} }) }}"
-},
-"id": "HTTP_Supabase",
-"name": "Supabase Insert (ingest_logs)",
-"type": "n8n-nodes-base.httpRequest",
-"typeVersion": 4.1,
-"position": [ 340, 160 ]
-},
-{
-"parameters": {
-"responseCode": 200,
-"responseFormat": "json",
-"responseBody": "={{ ({ ok: true, mode: $json.body?.mode ??
-'production', echo: $json.body ?? {} }) }}"
-},
-"id": "Resp_200",
-"name": "Respond 200",
-"type": "n8n-nodes-base.respondToWebhook",
-"typeVersion": 1.5,
-"position": [ 640, 160 ]
-}
-],
-"connections": {
-"Webhook (POST /firsatci/run)": { "main": [ [ { "node": "If (x-apikey)", "type": "main", "index": 0 } ] ] },
-"If (x-api-key)": { "main": [ [ { "node": "Supabase Insert
-(ingest_logs)", "type": "main", "index": 0 } ], [ { "node": "Respond 401",
-"type": "main", "index": 0 } ] ] },
-"Supabase Insert (ingest_logs)": { "main": [ [ { "node": "Respond 200",
-"type": "main", "index": 0 } ] ] }
-},
-"settings": {},
-"version": 2
+  "name": "SECURE_FIRSATCI_2_LOG",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "firsatci/run",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "7688af60-53b8-4ca2-8ad4-7cb57e76fc7d",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1184,
+        32
+      ],
+      "webhookId": "16d371b6-117e-454b-95a4-42ed0b2db673"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-key",
+              "leftValue": "={{ ($json[\"headers\"][\"x-api-key\"] || \"\").trim() }}",
+              "rightValue": "={{ ($vars.N8N_ACTION_KEY || \"\").trim() }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ac4237ff-4188-410e-9fcd-599982da5365",
+      "name": "If (x-api-key)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -896,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-body",
+              "leftValue": "={{ (typeof $json.body === 'object') && (typeof $json.body?.city === 'string') && (typeof $json.body?.district === 'string') && Number.isFinite(+($json.body?.threshold)) }}",
+              "rightValue": "=true",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a9e031d0-f183-4a6f-b5eb-3afef9d284d6",
+      "name": "If (body valid)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -592,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "route",
+              "value": "firsatci/run"
+            },
+            {
+              "name": "city",
+              "value": "={{ $json.body.city || '' }}"
+            },
+            {
+              "name": "district",
+              "value": "={{ $json.body.district || '' }}"
+            },
+            {
+              "name": "threshold",
+              "value": "={{ $json.body.threshold || '' }}"
+            },
+            {
+              "name": "ip",
+              "value": "={{ $json.headers['cf-connecting-ip'] || $json.headers['x-real-ip'] || $json.headers['x-forwarded-for'] || '' }}"
+            },
+            {
+              "name": "user_agent",
+              "value": "={{ $json.headers['user-agent'] || '' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0cf20b4c-466f-4caf-bf59-72319fc503c5",
+      "name": "Set (Prepare Log)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        -288,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SUPABASE_URL }}/rest/v1/ingest_logs",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "id": "f626b837-7407-4b95-b4e0-fbdf5d1505b7",
+      "name": "Supabase Insert (ingest_logs)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -32,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ ({ ok: true, mode: 'production', echo: $json.body ?? {} }) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "104b3894-8f90-431a-a178-520141568e3a",
+      "name": "Respond 200 (OK)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        256,
+        -96
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ ({ ok:false, error:'unauthorized' }) }}",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "id": "4124c829-bad6-4ba1-b134-2a625dcf3c40",
+      "name": "Respond 401 (Unauthorized)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -592,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ ({ ok: false, error: 'invalid_body' }) }}",
+        "options": {
+          "responseCode": 422
+        }
+      },
+      "id": "3f4a200c-978c-4748-9f23-f06e7cfe2f9d",
+      "name": "Respond 422 (Invalid Body)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -288,
+        128
+      ]
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "ysl-salih.app.n8n.cloud",
+            "user-agent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; tr-TR) WindowsPowerShell/5.1.19041.6157",
+            "content-length": "70",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "95.10.6.174",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "TR",
+            "cf-ray": "96eb75d7a02b16bf-AMS",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-api-key": "n8nsalih",
+            "x-forwarded-for": "95.10.6.174, 104.23.166.65",
+            "x-forwarded-host": "ysl-salih.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-68-6dfc679bd7-vl2lw",
+            "x-is-trusted": "yes",
+            "x-real-ip": "95.10.6.174"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "district": "Konyaalti",
+            "threshold": 15,
+            "mode": "full",
+            "city": "Antalya"
+          },
+          "webhookUrl": "https://ysl-salih.app.n8n.cloud/webhook/firsatci/run",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If (x-api-key)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If (x-api-key)": {
+      "main": [
+        [
+          {
+            "node": "If (body valid)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond 401 (Unauthorized)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If (body valid)": {
+      "main": [
+        [
+          {
+            "node": "Set (Prepare Log)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond 422 (Invalid Body)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set (Prepare Log)": {
+      "main": [
+        [
+          {
+            "node": "Supabase Insert (ingest_logs)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Insert (ingest_logs)": {
+      "main": [
+        [
+          {
+            "node": "Respond 200 (OK)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "39127b05-7be5-4c0f-b3d9-4baffa64ec15",
+  "meta": {
+    "instanceId": "994b9225438d70078f93844a9834ff3fb0b55e78471e85b4116429d429fcdc3f"
+  },
+  "id": "vuCiikCud4HiKJFa",
+  "tags": []
 }
