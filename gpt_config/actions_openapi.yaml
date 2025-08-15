@@ -1,0 +1,29 @@
+openapi: 3.1.0
+info: { title: Firsatci n8n Actions, version: "1.0.0" }
+servers: [ { url: https://ysl-salih.app.n8n.cloud } ]
+paths:
+  /webhook/smoke-secure:
+    post:
+      operationId: smokeSecure
+      security: [ { n8nApiKey: [] } ]
+      responses: { "200": { description: OK } }
+  /webhook/firsatci/run:
+    post:
+      operationId: runFirsatci
+      security: [ { n8nApiKey: [] } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mode, city, district, threshold]
+              properties:
+                mode: { type: string, enum: [full, quick], default: full }
+                city: { type: string }
+                district: { type: string }
+                threshold: { type: number, minimum: 1 }
+      responses: { "200": { description: OK }, "401": { description: Unauthorized }, "422": { description: Invalid body } }
+components:
+  securitySchemes:
+    n8nApiKey: { type: apiKey, in: header, name: x-api-key }
