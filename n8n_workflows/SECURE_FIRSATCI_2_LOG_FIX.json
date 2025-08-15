@@ -1,32 +1,108 @@
 {
-  "name":"SECURE_FIRSATCI_2_LOG_FIX",
-  "active":false,
-  "nodes":[
-    {"parameters":{"path":"firsatci/run","httpMethod":"POST","responseMode":"responseNode"},
-     "id":"Webhook_1","name":"Webhook (POST /firsatci/run)","type":"n8n-nodes-base.webhook","typeVersion":2.1,"position":[-240,280]},
-    {"parameters":{"conditions":{"options":{"caseSensitive":true,"typeValidation":"strict","version":2},
-      "conditions":[{"id":"cond-key",
-        "leftValue":"={{ ($json[\"headers\"][\"x-api-key\"] || \"\").trim() }}",
-        "rightValue":"={{ ($vars.N8N_ACTION_KEY || \"\").trim() }}",
-        "operator":{"type":"string","operation":"equals","name":"filter.operator.equals"}}],
-      "combinator":"and"}},"id":"If_Auth","name":"If (x-api-key)","type":"n8n-nodes-base.if","typeVersion":2.2,"position":[40,280]},
-    {"parameters":{"responseCode":401,"responseFormat":"json","responseBody":"={{ ({ ok:false, error:'Unauthorized', reason:'Invalid x-api-key' }) }}"},
-     "id":"Resp_401","name":"Respond 401","type":"n8n-nodes-base.respondToWebhook","typeVersion":1.5,"position":[340,410]},
-    {"parameters":{"method":"POST","url":"={{ $vars.SUPABASE_URL + '/rest/v1/ingest_logs' }}","authentication":"none","sendBody":true,"jsonParameters":true,
-      "headerParametersUi":{"parameter":[
-        {"name":"apikey","value":"={{ $vars.SUPABASE_SERVICE_KEY }}"},
-        {"name":"Authorization","value":"={{ 'Bearer ' + $vars.SUPABASE_SERVICE_KEY }}"},
-        {"name":"Content-Type","value":"application/json"},
-        {"name":"Prefer","value":"return=representation"}]},
-      "bodyParametersJson":"={{ ({ mode: $json.body?.mode ?? 'full', city: $json.body?.city ?? '', district: $json.body?.district ?? '', threshold: Number($json.body?.threshold ?? 0), payload: $json.body ?? {} }) }}"},
-     "id":"HTTP_Supabase","name":"Supabase Insert (ingest_logs)","type":"n8n-nodes-base.httpRequest","typeVersion":4.1,"position":[340,160]},
-    {"parameters":{"responseCode":200,"responseFormat":"json","responseBody":"={{ ({ ok:true, mode: $json.body?.mode ?? 'production', echo: $json.body ?? {} }) }}"},
-     "id":"Resp_200","name":"Respond 200","type":"n8n-nodes-base.respondToWebhook","typeVersion":1.5,"position":[640,160]}
-  ],
-  "connections":{
-    "Webhook (POST /firsatci/run)":{"main":[[{"node":"If (x-api-key)","type":"main","index":0}]]},
-    "If (x-api-key)":{"main":[[{"node":"Supabase Insert (ingest_logs)","type":"main","index":0}],[{"node":"Respond 401","type":"main","index":0}]]},
-    "Supabase Insert (ingest_logs)":{"main":[[{"node":"Respond 200","type":"main","index":0}]]}
-  },
-  "settings":{},"version":2
+"name": "SECURE_FIRSATCI_2_LOG_FIX",
+"active": false,
+"nodes": [
+{
+"parameters": {
+"path": "firsatci/run",
+"httpMethod": "POST",
+"responseMode": "responseNode"
+},
+"id": "Webhook_1",
+"name": "Webhook (POST /firsatci/run)",
+"type": "n8n-nodes-base.webhook",
+6
+"typeVersion": 2.1,
+"position": [ -240, 280 ]
+},
+{
+"parameters": {
+"conditions": {
+"options": { "caseSensitive": true, "typeValidation": "strict",
+"version": 2 },
+"conditions": [
+{
+"id": "cond-key",
+"leftValue": "={{ ($json[\"headers\"][\"x-api-key\"] ||
+\"\").trim() }}",
+"rightValue": "={{ ($vars.N8N_ACTION_KEY || \"\").trim() }}",
+"operator": { "type": "string", "operation": "equals", "name":
+"filter.operator.equals" }
+}
+],
+"combinator": "and"
+}
+},
+"id": "If_Auth",
+"name": "If (x-api-key)",
+"type": "n8n-nodes-base.if",
+"typeVersion": 2.2,
+"position": [ 40, 280 ]
+},
+{
+"parameters": {
+"responseCode": 401,
+"responseFormat": "json",
+"responseBody": "={{ ({ ok: false, error: 'Unauthorized', reason:
+'Invalid x-api-key' }) }}"
+},
+"id": "Resp_401",
+"name": "Respond 401",
+"type": "n8n-nodes-base.respondToWebhook",
+"typeVersion": 1.5,
+"position": [ 340, 410 ]
+},
+{
+"parameters": {
+"method": "POST",
+"url": "={{ $vars.SUPABASE_URL + '/rest/v1/ingest_logs' }}",
+"authentication": "none",
+"sendBody": true,
+"jsonParameters": true,
+"headerParametersUi": {
+"parameter": [
+{ "name": "apikey", "value":
+"={{ $vars.SUPABASE_SERVICE_KEY }}" },
+7
+{ "name": "Authorization", "value": "={{ 'Bearer ' +
+$vars.SUPABASE_SERVICE_KEY }}" },
+{ "name": "Content-Type", "value": "application/json" },
+{ "name": "Prefer", "value": "return=representation" }
+]
+},
+"bodyParametersJson":
+"={{ ({ mode: $json.body?.mode ?? 'full', city: $json.body?.city ?? '',
+district: $json.body?.district ?? '', threshold:
+Number($json.body?.threshold ?? 0), payload: $json.body ?? {} }) }}"
+},
+"id": "HTTP_Supabase",
+"name": "Supabase Insert (ingest_logs)",
+"type": "n8n-nodes-base.httpRequest",
+"typeVersion": 4.1,
+"position": [ 340, 160 ]
+},
+{
+"parameters": {
+"responseCode": 200,
+"responseFormat": "json",
+"responseBody": "={{ ({ ok: true, mode: $json.body?.mode ??
+'production', echo: $json.body ?? {} }) }}"
+},
+"id": "Resp_200",
+"name": "Respond 200",
+"type": "n8n-nodes-base.respondToWebhook",
+"typeVersion": 1.5,
+"position": [ 640, 160 ]
+}
+],
+"connections": {
+"Webhook (POST /firsatci/run)": { "main": [ [ { "node": "If (x-apikey)", "type": "main", "index": 0 } ] ] },
+"If (x-api-key)": { "main": [ [ { "node": "Supabase Insert
+(ingest_logs)", "type": "main", "index": 0 } ], [ { "node": "Respond 401",
+"type": "main", "index": 0 } ] ] },
+"Supabase Insert (ingest_logs)": { "main": [ [ { "node": "Respond 200",
+"type": "main", "index": 0 } ] ] }
+},
+"settings": {},
+"version": 2
 }
