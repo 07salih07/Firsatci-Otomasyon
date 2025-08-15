@@ -41,7 +41,6 @@ plaka_hash text,
 tarih timestamptz default now(),
 fiyat numeric,
 currency text
-12
 );
 -- notifications
 create table if not exists public.notifications (
