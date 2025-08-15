@@ -1,40 +1,140 @@
 {
   "name": "SECURE_SMOKE",
-  "active": false,
   "nodes": [
     {
       "parameters": {
-        "path": "smoke-secure",
         "httpMethod": "POST",
+        "path": "smoke-secure",
         "responseMode": "responseNode",
         "options": {}
       },
-      "id": "Webhook_1",
-      "name": "Webhook (POST /smoke-secure)",
+      "id": "e20cd309-342c-4aea-87cd-9d36bae5b7b0",
+      "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
-      "position": [-240, 200]
+      "position": [
+        -96,
+        48
+      ],
+      "webhookId": "c72a0412-bcf8-4753-a213-ce3d47f0fabb"
     },
     {
       "parameters": {
-        "responseFormat": "json",
-        "responseBody": "={{ ({ ok: true, echo: $json.body ?? {} }) }}",
-        "options": { "responseCode": 200 }
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-1",
+              "leftValue": "={{ $json[\"headers\"][\"x-api-key\"] }}",
+              "rightValue": "=n8nsalih",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
-      "id": "Resp_200",
-      "name": "Respond 200",
+      "id": "2a3ace68-7cba-4b8e-86a7-d59ca21a48d8",
+      "name": "If (x-api-key)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ ({ ok: true, mode: $json.executionMode ?? 'production', echo: $json.body ?? {} }) }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "bd110eda-fecf-4344-b3be-fe096e49f24d",
+      "name": "Respond 200 (OK)",
       "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.4,
-      "position": [80, 200]
+      "typeVersion": 1.5,
+      "position": [
+        512,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ ({ ok: false, error: 'unauthorized' }) }}",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "id": "8cf30bb2-de8c-412c-b54b-d03401d92107",
+      "name": "Respond 401 (Unauthorized)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        512,
+        80
+      ]
     }
   ],
+  "pinData": {},
   "connections": {
-    "Webhook (POST /smoke-secure)": {
+    "Webhook": {
       "main": [
-        [ { "node": "Respond 200", "type": "main", "index": 0 } ]
+        [
+          {
+            "node": "If (x-api-key)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If (x-api-key)": {
+      "main": [
+        [
+          {
+            "node": "Respond 200 (OK)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond 401 (Unauthorized)",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
-  "settings": {},
-  "version": 2
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a64f06e4-e64f-4ef6-98a8-e491aa076e6a",
+  "meta": {
+    "instanceId": "994b9225438d70078f93844a9834ff3fb0b55e78471e85b4116429d429fcdc3f"
+  },
+  "id": "8ojGPPLPRROuEm0T",
+  "tags": []
 }
