@@ -1,37 +1,40 @@
 {
-"name": "SECURE_SMOKE",
-"active": false,
-"nodes": [
-{
-"parameters": {
-"path": "smoke-secure",
-"httpMethod": "POST",
-"responseMode": "responseNode"
-},
-"id": "Webhook_1",
-"name": "Webhook (POST /smoke-secure)",
-"type": "n8n-nodes-base.webhook",
-"typeVersion": 2.1,
-"position": [ -240, 200 ]
-},
-{
-"parameters": {
-"responseCode": 200,
-"responseFormat": "json",
-"responseBody": "={{ ({ ok: true, echo: $json.body ?? {} }) }}"
-},
-"id": "Resp_200",
-"name": "Respond 200",
-"type": "n8n-nodes-base.respondToWebhook",
-"typeVersion": 1.5,
-"position": [ 80, 200 ]
-}
-],
-"connections": {
-"Webhook (POST /smoke-secure)": { "main": [ [ { "node": "Respond 200",
-4
-"type": "main", "index": 0 } ] ] }
-},
-"settings": {},
-"version": 2
+  "name": "SECURE_SMOKE",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "smoke-secure",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "Webhook_1",
+      "name": "Webhook (POST /smoke-secure)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-240, 200]
+    },
+    {
+      "parameters": {
+        "responseFormat": "json",
+        "responseBody": "={{ ({ ok: true, echo: $json.body ?? {} }) }}",
+        "options": { "responseCode": 200 }
+      },
+      "id": "Resp_200",
+      "name": "Respond 200",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [80, 200]
+    }
+  ],
+  "connections": {
+    "Webhook (POST /smoke-secure)": {
+      "main": [
+        [ { "node": "Respond 200", "type": "main", "index": 0 } ]
+      ]
+    }
+  },
+  "settings": {},
+  "version": 2
 }
